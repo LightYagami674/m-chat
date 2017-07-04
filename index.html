@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MACHAT</title>
+    <script src="http://localhost:8080/js/jquery-3.1.1.min.js"></script>
+    <script src="http://localhost:8080/js/tether.min.js"></script>
+    <script src="http://localhost:8080/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="http://localhost:8080/css/bootstrap.css">
+    <link rel="stylesheet" href="http://localhost:8080/css/main.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="jumbotron">
+        <h1 style="text-shadow: 1px 13px 10px;">M-CHAT APP</h1>
+    </div>
+
+    <div id="gettingStarted">
+        <h2>Getting Started in 3 steps:</h2>
+        <ul>
+            <li>Select a username for yourself.</li>
+            <li>Join or create a room</li>
+            <li>That's it ! Start chatting!</li>
+        </ul>
+    </div>
+
+    <form id="login" >
+        <fieldset class="form-group">
+            <label>Username:-</label>
+            <input class="form-control" placeholder="JohnSmith123" id="username" />
+        </fieldset>
+        <fieldset class="form-group">
+            <label>Room Name:-</label>
+            <input class="form-control" placeholder="Room Name" id="roomname" />
+        </fieldset>
+
+        <button id="final" class="btn btn-primary" style="transform: translate(250%);">ENTER THE ROOM</button>
+    </form>
+
+
+</div>
+
+<!--SUCCESS MODAL HERE-->
+<div class="modal fade" id="flipFlop" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modalLabel">Success <span style="color: green">✅</span></h4>
+            </div>
+            <div class="modal-body">
+                Joining Successfull!
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="taketoroom">Take me to the room!</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--MODAL END-->
+<!--FAILURE MODAL HERE-->
+<div class="modal fade" id="tipTop" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="tipmodalLabel">Failure <span style="color: red">✖</span></h4>
+            </div>
+            <div class="modal-body">
+                Username already taken! Choose another name!
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" data-dismiss="modal" >CLOSE</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--MODAL END-->
+
+
+
+<script>
+
+    var socket=io();
+    var pageuser="";
+    var roomname="";
+
+    $('#final').on('click',function (e) {
+        e.preventDefault()
+        const username=$("#username").val();
+        roomname=$("#roomname").val();
+        pageuser=username;
+
+
+        socket.emit('usercheck',{username:username});
+        
+        socket.on('usercheckresult',function (e) {
+            if(e.result){
+                console.log("success");
+                $('#flipFlop').modal('show');
+
+            }
+            else{
+                console.log("failure");
+                $("#tipTop").modal('show');
+                $("#username").val("");
+            }
+        })
+    })
+
+
+$("#taketoroom").on('click',function (e) {
+    e.preventDefault();
+
+    socket.emit('adduser',{username:pageuser,roomname:roomname});
+
+    window.location="http://localhost:8080/chatpage?username="+pageuser+"&roomname="+roomname;
+
+
+})
+
+</script>
+</body>
+
+</html>

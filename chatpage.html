@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MACHAT</title>
+    <script src="http://localhost:8080/js/jquery-3.1.1.min.js"></script>
+    <script src="http://localhost:8080/js/tether.min.js"></script>
+    <script src="http://localhost:8080/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="http://localhost:8080/css/bootstrap.css">
+    <link rel="stylesheet" href="http://localhost:8080/css/main.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="jumbotron">
+            <h1 style="text-shadow: 1px 13px 10px;">M-CHAT APP</h1>
+            <button class="btn btn-info float-md-right" id="logout" onclick="takeBack()">LOGOUT</button>
+        </div>
+
+        <div id="chatWindow">
+            <input class="form-control" placeholder="Enter message"  id="messageInput"/>
+        </div>
+        <div id="onlineWindow" class="col-md-3">
+            <h4>Online Members:</h4>
+            <ul id="onlineList">
+
+            </ul>
+        </div>
+    </div>
+
+<script>
+
+    const search=window.location.search;
+    const roomname=search.substr(search.lastIndexOf("=")+1);
+    const pageuser=search.substr(search.indexOf("=")+1,search.indexOf("&")-search.indexOf("=")-1);
+
+    var socket =io();
+    //explicitly request for users list
+    socket.emit('showlist',{roomname:roomname});
+
+    $("#logout").on('click',function (e) {
+        e.preventDefault();
+    })
+
+    function takeBack() {
+        socket.emit('leave',{username:pageuser,roomname:roomname});
+        window.location="http://localhost:8080";
+    }
+
+   $('#messageInput').on('keydown',function (e) {
+       if(e.key=="Enter"){
+           var message=$("#messageInput").val();
+           socket.emit('sendmessage',{username:pageuser,roomname:roomname,message:message});
+           $('#messageInput').val("");
+
+           //own message display
+           showOwnMessage(pageuser,message);
+
+
+       }
+   })
+
+    //recieve message
+    socket.on('recievemessage',function (e) {
+        console.log("recieved message from server")
+        showAnotherMessage(e);
+    })
+
+    //update the list UI
+    socket.on('updateuserlist',function (e) {
+        console.log("Here is list"+e);
+        $("#onlineList").html("");
+        e.list.forEach(function(each){
+            var li=document.createElement('li');
+            li.innerText=each;
+            $("#onlineList").append(li);
+        })
+    })
+
+
+
+    //onclose event for window
+    window.onunload=function () {
+        socket.emit('leave',{username:pageuser,roomname:roomname});
+    }
+
+
+    function showAnotherMessage(e){
+        var par=document.createElement('p');
+        par.id="anothermsg";
+        par.innerHTML="<b>"+e.username+"</b>"+": "+e.message;
+        $("#chatWindow").append(par);
+    }
+    function showOwnMessage(pageuser,message){
+        var par=document.createElement('p');
+        par.id="ownmsg";
+        par.innerHTML="<b>"+pageuser+"</b>"+": "+message;
+        $("#chatWindow").append(par);
+    }
+
+
+</script>
+</body>
+</html>
