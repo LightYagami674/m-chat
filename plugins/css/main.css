@@ -12,10 +12,12 @@
     width: 60%;
     height:400px;
     margin:auto;
-    overflow-y: auto;
     margin-bottom: 30px;
     float:left;
+    overflow-y: scroll;
 }
+
+
 
 #onlineWindow{
     float: right;

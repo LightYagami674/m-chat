@@ -19,47 +19,48 @@ app.get('/chatpage',function (req,res) {
 })
 
 
-var users=[];
+var users={};
 
 io.on('connection',function(socket){
 
-
     //usercheck event
     socket.on('usercheck',function (e) {
-        var user=e.username
-        var res=arrCheck(user,users);
+
+        var res=jsonCheck(e.username,e.roomname);
         socket.emit('usercheckresult',{result:res});
 
     })
 
     //adding user to the users array
     socket.on('adduser',function (e) {
-        users.push(e.username);
+        addToUsersList(e.username,e.roomname);
         socket.join(e.roomname);
         //emit to all
-        io.to(e.roomname).emit('updateuserlist',{list:users});
-        console.log("added "+e.username+" to the room "+e.roomname);
+        io.to(e.roomname).emit('updateuserlist',{list:users[e.roomname]});
+        console.log(users);
 
     })
 
     //handler for getting and sending messages
     socket.on('sendmessage',function (e) {
 
-        console.log("Got message from "+e.username+" inside the room "+e.roomname);
-        socket.broadcast.to(e.roomname).emit('recievemessage',{username:e.username,message:e.message});
+        socket.to(e.roomname).broadcast.emit('recievemessage',{username:e.username,message:e.message});
 
     })
 
     //leave the socket
     socket.on('leave',function(e){
-        users.splice(users.indexOf(e.username),1);
+
+        var room=e.roomname;
+
+        users[room].splice(users[room].indexOf(e.username),1);
         socket.leave(e.roomname);
-        io.to(e.roomname).emit('updateuserlist',{list:users});
+        io.to(e.roomname).emit('updateuserlist',{list:users[e.roomname]});
     })
     
     //exclusive event for showlist
     socket.on('showlist',function (e) {
-        socket.emit('updateuserlist',{list:users});
+        socket.emit('updateuserlist',{list:users[e.roomname]});
     })
 
 
@@ -68,16 +69,25 @@ io.on('connection',function(socket){
 })
 
 
-function arrCheck(user,users){
-    for(i=0;i<users.length;i++){
 
-        if(user===users[i]){
-            return false;
-        }
 
+function jsonCheck(user,room) {
+    if(room in users){
+        return true;
     }
+    else{
+        return true;
+    }
+}
 
-    return true;
+function addToUsersList(name,room) {
+    if(room in users){
+        users[room].push(name);
+    }
+    else{
+        users[room]=[];
+        users[room].push(name);
+    }
 }
 
 

@@ -91,7 +91,7 @@
         pageuser=username;
 
 
-        socket.emit('usercheck',{username:username});
+        socket.emit('usercheck',{username:username,roomname:roomname});
         
         socket.on('usercheckresult',function (e) {
             if(e.result){
@@ -110,8 +110,6 @@
 
 $("#taketoroom").on('click',function (e) {
     e.preventDefault();
-
-    socket.emit('adduser',{username:pageuser,roomname:roomname});
 
     window.location="http://localhost:8080/chatpage?username="+pageuser+"&roomname="+roomname;
 

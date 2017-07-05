@@ -17,9 +17,11 @@
             <button class="btn btn-info float-md-right" id="logout" onclick="takeBack()">LOGOUT</button>
         </div>
 
-        <div id="chatWindow">
-            <input class="form-control" placeholder="Enter message"  id="messageInput"/>
-        </div>
+
+            <div id="chatWindow">
+                <input class="form-control" placeholder="Enter message"  id="messageInput" />
+            </div>
+
         <div id="onlineWindow" class="col-md-3">
             <h4>Online Members:</h4>
             <ul id="onlineList">
@@ -34,7 +36,10 @@
     const roomname=search.substr(search.lastIndexOf("=")+1);
     const pageuser=search.substr(search.indexOf("=")+1,search.indexOf("&")-search.indexOf("=")-1);
 
+
     var socket =io();
+
+    socket.emit('adduser',{username:pageuser,roomname:roomname});
     //explicitly request for users list
     socket.emit('showlist',{roomname:roomname});
 
