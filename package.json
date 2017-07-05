@@ -13,6 +13,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
+   "engines": {
+    "node": "6.10.3"
+  },
   "author": "",
   "license": "ISC"
 }
