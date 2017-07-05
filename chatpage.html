@@ -20,13 +20,16 @@
         </div>
 
 
-            <div id="chatWindow">
+            <div id="chatParentWindow">
                 <input class="form-control" placeholder="Enter message"  id="messageInput" />
+                <div id="chatWindow">
+
+                </div>
             </div>
 
 
         <div id="onlineWindow" class="col-md-3">
-            <h4>Online Members:</h4>
+            <h4>Online Members <span class="badge badge-info"></span>:</h4>
             <ul id="onlineList">
 
             </ul>
@@ -66,6 +69,8 @@
 
            //own message display
            showOwnMessage(pageuser,message);
+           var chat=document.getElementById("chatWindow");
+           chat.scrollTop=chat.scrollHeight;
 
 
        }
@@ -75,16 +80,20 @@
     socket.on('recievemessage',function (e) {
         console.log("recieved message from server")
         showAnotherMessage(e);
+        var chat=document.getElementById("chatWindow");
+        chat.scrollTop=chat.scrollHeight;
+
     })
 
     //update the list UI
     socket.on('updateuserlist',function (e) {
-        console.log("Here is list"+e);
+        $("span").text(e.list.length);
         $("#onlineList").html("");
         e.list.forEach(function(each){
             var li=document.createElement('li');
             li.innerText=each;
             $("#onlineList").append(li);
+
         })
     })
 
