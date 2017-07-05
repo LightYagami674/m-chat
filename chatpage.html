@@ -15,12 +15,15 @@
         <div class="jumbotron">
             <h1 style="text-shadow: 1px 13px 10px;">M-CHAT APP</h1>
             <button class="btn btn-info float-md-right" id="logout" onclick="takeBack()">LOGOUT</button>
+            <h5 id="loggedIn"></h5>
+            <h5 id="roomIn"></h5>
         </div>
 
 
             <div id="chatWindow">
                 <input class="form-control" placeholder="Enter message"  id="messageInput" />
             </div>
+
 
         <div id="onlineWindow" class="col-md-3">
             <h4>Online Members:</h4>
@@ -36,6 +39,9 @@
     const roomname=search.substr(search.lastIndexOf("=")+1);
     const pageuser=search.substr(search.indexOf("=")+1,search.indexOf("&")-search.indexOf("=")-1);
 
+    //set logged in name and room in name
+    $("#loggedIn").text("You are logged in as "+pageuser);
+    $("#roomIn").text("Room Name - "+roomname);
 
     var socket =io();
 
@@ -81,13 +87,6 @@
             $("#onlineList").append(li);
         })
     })
-
-
-
-    //onclose event for window
-    window.onunload=function () {
-        socket.emit('leave',{username:pageuser,roomname:roomname});
-    }
 
 
     function showAnotherMessage(e){

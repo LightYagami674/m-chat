@@ -65,7 +65,7 @@
             <div class="modal-header">
                 <h4 class="modal-title" id="tipmodalLabel">Failure <span style="color: red">✖</span></h4>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" id="tipBody">
                 Username already taken! Choose another name!
             </div>
             <div class="modal-footer">
@@ -86,25 +86,35 @@
 
     $('#final').on('click',function (e) {
         e.preventDefault()
-        const username=$("#username").val();
-        roomname=$("#roomname").val();
-        pageuser=username;
+        const username = $("#username").val();
+        roomname = $("#roomname").val();
+        pageuser = username;
+
+        if (username === "" || roomname === "") {
+            $("#tipBody").text("Please Enter a valid Username/Roomname");
+            $("#tipTop").modal('show');
+        }
+        else {
 
 
-        socket.emit('usercheck',{username:username,roomname:roomname});
-        
-        socket.on('usercheckresult',function (e) {
-            if(e.result){
+
+        socket.emit('usercheck', {username: username, roomname: roomname});
+
+        socket.on('usercheckresult', function (e) {
+            if (e.result) {
                 console.log("success");
                 $('#flipFlop').modal('show');
 
             }
-            else{
+            else {
                 console.log("failure");
+                $("#tipBody").text("Username already taken! Choose another name!")
                 $("#tipTop").modal('show');
                 $("#username").val("");
             }
         })
+
+            }
     })
 
 

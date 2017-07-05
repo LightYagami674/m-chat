@@ -37,7 +37,8 @@ io.on('connection',function(socket){
         socket.join(e.roomname);
         //emit to all
         io.to(e.roomname).emit('updateuserlist',{list:users[e.roomname]});
-        console.log(users);
+        socket.username=e.username;
+        socket.roomname=e.roomname;
 
     })
 
@@ -48,20 +49,31 @@ io.on('connection',function(socket){
 
     })
 
-    //leave the socket
-    socket.on('leave',function(e){
+    //if user disconnects immediately
+    socket.on('disconnect',function(){
+        if(socket.roomname in users) {
 
-        var room=e.roomname;
-
-        users[room].splice(users[room].indexOf(e.username),1);
-        socket.leave(e.roomname);
-        io.to(e.roomname).emit('updateuserlist',{list:users[e.roomname]});
+            users[socket.roomname].splice(users[socket.roomname].indexOf(socket.username), 1);
+            io.to(socket.roomname).emit('updateuserlist',{list:users[socket.roomname]});
+        }
     })
+
+    //leave the socket
+    // socket.on('leave',function(e){
+    //
+    //     var room=e.roomname;
+    //
+    //     users[room].splice(users[room].indexOf(e.username),1);
+    //     socket.leave(e.roomname);
+    //     io.to(e.roomname).emit('updateuserlist',{list:users[e.roomname]});
+    // })
     
     //exclusive event for showlist
     socket.on('showlist',function (e) {
         socket.emit('updateuserlist',{list:users[e.roomname]});
     })
+
+
 
 
 
