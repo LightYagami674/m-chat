@@ -58,20 +58,22 @@ io.on('connection',function(socket){
         }
     })
 
-    //leave the socket
-    // socket.on('leave',function(e){
-    //
-    //     var room=e.roomname;
-    //
-    //     users[room].splice(users[room].indexOf(e.username),1);
-    //     socket.leave(e.roomname);
-    //     io.to(e.roomname).emit('updateuserlist',{list:users[e.roomname]});
-    // })
+
     
     //exclusive event for showlist
     socket.on('showlist',function (e) {
         socket.emit('updateuserlist',{list:users[e.roomname]});
     })
+
+    //sending image to the users
+    
+    socket.on("sendImage",function (dataURL) {
+
+        socket.to(socket.roomname).emit('recieveImage',dataURL);
+
+    })
+
+
 
 
 
@@ -85,7 +87,7 @@ io.on('connection',function(socket){
 
 function jsonCheck(user,room) {
     if(room in users){
-        return true;
+        return !users[room].includes(user);
     }
     else{
         return true;

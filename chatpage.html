@@ -8,6 +8,7 @@
     <script src="js/bootstrap.js"></script>
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
@@ -21,7 +22,10 @@
 
 
             <div id="chatParentWindow">
+                <div class="input-group">
                 <input class="form-control" placeholder="Enter message"  id="messageInput" />
+                    <button class="btn btn-primary input-group-addon" id="addImage" ><span class="fa fa-camera"></span> </button>
+                </div>
                 <div id="chatWindow">
 
                 </div>
@@ -36,11 +40,31 @@
         </div>
     </div>
 
+    <input type="file" id="fileInput" style="display: none;">
+
+    <!--FAILURE MODAL HERE-->
+    <div class="modal fade" id="tipTop" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="tipmodalLabel">Failure <span style="color: red">✖</span></h4>
+                </div>
+                <div class="modal-body" id="tipBody">
+                    Invalid Image Format...
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-danger" data-dismiss="modal" >CLOSE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--MODAL END-->
+
 <script>
 
     const search=window.location.search;
-    const roomname=search.substr(search.lastIndexOf("=")+1);
-    const pageuser=search.substr(search.indexOf("=")+1,search.indexOf("&")-search.indexOf("=")-1);
+    const roomname=decodeURI(search.substr(search.lastIndexOf("=")+1));
+    const pageuser=decodeURI(search.substr(search.indexOf("=")+1,search.indexOf("&")-search.indexOf("=")-1));
 
     //set logged in name and room in name
     $("#loggedIn").text("You are logged in as "+pageuser);
@@ -87,7 +111,7 @@
 
     //update the list UI
     socket.on('updateuserlist',function (e) {
-        $("span").text(e.list.length);
+        $(".badge").text(e.list.length);
         $("#onlineList").html("");
         e.list.forEach(function(each){
             var li=document.createElement('li');
@@ -95,6 +119,14 @@
             $("#onlineList").append(li);
 
         })
+    })
+
+    //image handler event
+    socket.on("recieveImage",function (dataURL) {
+        var img=document.createElement("img");
+        img.src=dataURL;
+        img.id="sentImage";
+        $("#chatWindow").append(img);
     })
 
 
@@ -111,7 +143,36 @@
         $("#chatWindow").append(par);
     }
 
+    //fileInput handler
 
+    const fileIn=document.getElementById("fileInput");
+
+    $("#addImage").on('click',function () {
+        fileIn.click();
+    })
+    
+    fileIn.onchange=function () {
+       var file=fileIn.files[0];
+       if(file.type.includes('image')){
+           var reader=new FileReader();
+           //reader load event
+           reader.onload=function(){
+                var res=reader.result;
+                socket.emit("sendImage",res);
+               var img=document.createElement("img");
+               img.src=res;
+               img.id="sentImage";
+               $("#chatWindow").append(img);
+           }
+           reader.readAsDataURL(file);
+
+           //sending image to this page
+
+       }
+       else{
+            $("#tipTop").modal('show');
+       }
+    }
 </script>
 </body>
 </html>
