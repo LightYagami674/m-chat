@@ -122,11 +122,9 @@
 
     //image handler event
     socket.on("recieveImage",function (dataURL) {
-        var img=document.createElement("img");
-        img.src=dataURL;
-        img.id="sentImage";
-        img.align="left";
-        $("#chatWindow").append(img);
+        var p=document.createElement("div");
+        p.innerHTML="<img id='sentImage' src='"+dataURL+"' align='bottom'></img><br/>"
+        $("#chatWindow").append(p);
         showLast();
     })
 
@@ -165,11 +163,9 @@
            reader.onload=function(){
                 var res=reader.result;
                 socket.emit("sendImage",res);
-               var img=document.createElement("img");
-               img.src=res;
-               img.id="ownImage";
-               img.align="right";
-               $("#chatWindow").append(img);
+               var p=document.createElement("div");
+               p.innerHTML="<img src='"+res+"' align='right' id='ownImage' align='bottom'></img><br/>";
+               $("#chatWindow").append(p);
                showLast();
            }
            reader.readAsDataURL(file);
