@@ -62,7 +62,29 @@
     float:right;
     clear:right;
 
+}
 
+#sentImage{
+    background-color: dodgerblue;
+    width:250px;
+    height: 250px;
+    border-radius: 7px;
+    padding: 2px;
+    margin:10px;
+    float:left;
+    clear:right;
+
+}
+
+#ownImage{
+    background-color: coral;
+    height:250px;
+    width:250px;
+    border-radius: 7px;
+    padding: 2px;
+    margin:10px;
+    float:right;
+    clear:right;
 
 
 }

@@ -104,8 +104,7 @@
     socket.on('recievemessage',function (e) {
         console.log("recieved message from server")
         showAnotherMessage(e);
-        var chat=document.getElementById("chatWindow");
-        chat.scrollTop=chat.scrollHeight;
+        showLast();
 
     })
 
@@ -126,7 +125,9 @@
         var img=document.createElement("img");
         img.src=dataURL;
         img.id="sentImage";
+        img.align="left";
         $("#chatWindow").append(img);
+        showLast();
     })
 
 
@@ -141,6 +142,11 @@
         par.id="ownmsg";
         par.innerHTML="<b>"+pageuser+"</b>"+": "+message;
         $("#chatWindow").append(par);
+    }
+
+    function showLast(){
+        var chat=document.getElementById("chatWindow");
+        chat.scrollTop=chat.scrollHeight;
     }
 
     //fileInput handler
@@ -161,8 +167,10 @@
                 socket.emit("sendImage",res);
                var img=document.createElement("img");
                img.src=res;
-               img.id="sentImage";
+               img.id="ownImage";
+               img.align="right";
                $("#chatWindow").append(img);
+               showLast();
            }
            reader.readAsDataURL(file);
 
@@ -173,6 +181,8 @@
             $("#tipTop").modal('show');
        }
     }
+    
+
 </script>
 </body>
 </html>
