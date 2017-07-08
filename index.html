@@ -99,13 +99,16 @@
     //exclusive request for room list
     socket.emit("reqroomlist");
     socket.on('resroomlist',function(e){
-        console.log("Got a list "+e);
         $("#roomlist").html("");
         e.list.forEach(function(room){
             var rname=document.createElement('a');
             rname.className="dropdown-item";
             rname.href="#";
             rname.text=room;
+            rname.addEventListener('click',function(){
+                $("#roomname").val(rname.text);
+            })
+
             $("#roomlist").append(rname);
         })
     })
@@ -152,6 +155,8 @@
 
 
     })
+    
+
 
 </script>
 </body>
