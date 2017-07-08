@@ -8,6 +8,7 @@
     <script src="js/bootstrap.js"></script>
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
@@ -33,9 +34,19 @@
         <fieldset class="form-group">
             <label>Room Name:-</label>
             <input class="form-control" placeholder="Room Name" id="roomname" />
-        </fieldset>
+            <div class="dropdown float-right">
+                <button class="btn  dropdown-toggle" type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: #5cb85c">
+                    Available Rooms
+                </button>
+                <div class="dropdown-menu" aria-labelledby="about-us" id="roomlist">
 
-        <button id="final" class="btn btn-primary" style="transform: translate(250%);">ENTER THE ROOM</button>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+
+        </fieldset>
+        <button id="final" class="btn btn-primary">ENTER THE ROOM</button>
     </form>
 
 
@@ -84,6 +95,22 @@
     var pageuser="";
     var roomname="";
 
+
+    //exclusive request for room list
+    socket.emit("reqroomlist");
+    socket.on('resroomlist',function(e){
+        console.log("Got a list "+e);
+        $("#roomlist").html("");
+        e.list.forEach(function(room){
+            var rname=document.createElement('a');
+            rname.className="dropdown-item";
+            rname.href="#";
+            rname.text=room;
+            $("#roomlist").append(rname);
+        })
+    })
+
+
     $('#final').on('click',function (e) {
         e.preventDefault()
         const username = $("#username").val();
@@ -118,13 +145,13 @@
     })
 
 
-$("#taketoroom").on('click',function (e) {
-    e.preventDefault();
+    $("#taketoroom").on('click',function (e) {
+        e.preventDefault();
 
-    window.location="/chatpage?username="+pageuser+"&roomname="+roomname;
+        window.location="/chatpage?username="+pageuser+"&roomname="+roomname;
 
 
-})
+    })
 
 </script>
 </body>

@@ -81,7 +81,6 @@
     })
 
     function takeBack() {
-        socket.emit('leave',{username:pageuser,roomname:roomname});
         window.location="/index";
     }
 
@@ -121,10 +120,11 @@
     })
 
     //image handler event
-    socket.on("recieveImage",function (dataURL) {
-        var p=document.createElement("div");
-        p.innerHTML="<img id='sentImage' src='"+dataURL+"' align='bottom'></img><br/>"
-        $("#chatWindow").append(p);
+    socket.on("recieveImage",function (e) {
+        var div=document.createElement('div');
+        div.innerHTML="<div id='imtitle'>"+e.username+"</div><img src='"+e.image+"' id='images' align='center'/>"
+        div.id="sentImage";
+        $("#chatWindow").append(div);
         showLast();
     })
 
@@ -163,9 +163,10 @@
            reader.onload=function(){
                 var res=reader.result;
                 socket.emit("sendImage",res);
-               var p=document.createElement("div");
-               p.innerHTML="<img src='"+res+"' align='right' id='ownImage' align='bottom'></img><br/>";
-               $("#chatWindow").append(p);
+               var div=document.createElement('div');
+               div.innerHTML="<div id='imtitle'>"+pageuser+"</div><img src='"+res+"' id='images' align='center'/>"
+               div.id="ownImage";
+               $("#chatWindow").append(div);
                showLast();
            }
            reader.readAsDataURL(file);

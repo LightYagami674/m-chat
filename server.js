@@ -40,6 +40,7 @@ io.on('connection',function(socket){
         socket.username=e.username;
         socket.roomname=e.roomname;
 
+
     })
 
     //handler for getting and sending messages
@@ -54,8 +55,20 @@ io.on('connection',function(socket){
         if(socket.roomname in users) {
 
             users[socket.roomname].splice(users[socket.roomname].indexOf(socket.username), 1);
+            console.log(socket.roomname);
+
+            if(isRoomEmpty(users[socket.roomname])){
+                delete users[socket.roomname];
+                var list=getRoomList();
+                io.emit('resroomlist',{list:list});
+            }
             io.to(socket.roomname).emit('updateuserlist',{list:users[socket.roomname]});
+
+
         }
+
+
+
     })
 
 
@@ -69,8 +82,13 @@ io.on('connection',function(socket){
     
     socket.on("sendImage",function (dataURL) {
 
-        socket.to(socket.roomname).emit('recieveImage',dataURL);
+        socket.to(socket.roomname).emit('recieveImage',{username:socket.username,image:dataURL});
 
+    })
+
+    socket.on('reqroomlist',function(){
+        var list = getRoomList();
+        socket.emit('resroomlist',{list:list});
     })
 
 
@@ -91,6 +109,7 @@ function jsonCheck(user,room) {
     }
     else{
         return true;
+
     }
 }
 
@@ -101,11 +120,30 @@ function addToUsersList(name,room) {
     else{
         users[room]=[];
         users[room].push(name);
+        var list=getRoomList();
+        io.emit("resroomlist",{list:list});
+
     }
 }
 
+function getRoomList(){
+    var list=[];
+    for(room in users){
+        list.push(room);
+    }
 
+    return list;
+}
 
+function isRoomEmpty(room) {
+    if(room.length===0) {
+        return true;
+    }
+    else{
+        return false;
+    }
+
+}
 
 
 

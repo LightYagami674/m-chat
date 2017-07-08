@@ -66,25 +66,30 @@
 
 #sentImage{
     background-color: dodgerblue;
-    width:250px;
-    height: 250px;
+    width:252px;
     border-radius: 7px;
     padding: 2px;
     margin:10px;
     clear:right;
-
-
+}
+#imtitle{
+    text-align: center;
+    color: white;
 }
 
 #ownImage{
     background-color: coral;
-    height:250px;
-    width:250px;
+    width:252px;
     border-radius: 7px;
     padding: 2px;
     margin:10px;
     float:right;
     clear:right;
-
-
 }
+
+#images{
+    height: 250px;
+    width: 250px;
+    padding:1px;
+}
+
