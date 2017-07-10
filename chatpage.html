@@ -25,6 +25,7 @@
                 <div class="input-group">
                 <input class="form-control" placeholder="Enter message"  id="messageInput" />
                     <button class="btn btn-primary input-group-addon" id="addImage" ><span class="fa fa-camera"></span> </button>
+                    <button class="btn btn-primary input-group-addon" id="addDocument"><span class="fa fa-file"></span> </button>
                 </div>
                 <div id="chatWindow">
 
@@ -41,6 +42,7 @@
     </div>
 
     <input type="file" id="fileInput" style="display: none;">
+    <input type="file" id="imageInput" style="display:none;">
 
     <!--FAILURE MODAL HERE-->
     <div class="modal fade" id="tipTop" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
@@ -59,6 +61,11 @@
         </div>
     </div>
     <!--MODAL END-->
+    <!--TOAST START-->
+    <div id="toast">
+        <div id="toastContent"></div>
+    </div>
+    <!--Toast script at the end-->
 
 <script>
 
@@ -128,6 +135,11 @@
         showLast();
     })
 
+    //image toast handler
+    socket.on("resimagetoast",function(user){
+        console.log("got it");
+        initToast("Getting Image sent by "+user);
+    })
 
     function showAnotherMessage(e){
         var par=document.createElement('p');
@@ -150,14 +162,16 @@
     //fileInput handler
 
     const fileIn=document.getElementById("fileInput");
+    const imageIn=document.getElementById("imageInput");
 
     $("#addImage").on('click',function () {
-        fileIn.click();
+        imageIn.click();
     })
     
-    fileIn.onchange=function () {
-       var file=fileIn.files[0];
+    imageIn.onchange=function () {
+       var file=imageIn.files[0];
        if(file.type.includes('image')){
+           socket.emit("reqimagetoast");
            var reader=new FileReader();
            //reader load event
            reader.onload=function(){
@@ -171,13 +185,38 @@
            }
            reader.readAsDataURL(file);
 
-           //sending image to this page
-
        }
        else{
             $("#tipTop").modal('show');
        }
     }
+
+    $("#addDocument").on('click',function () {
+        fileIn.click();
+    })
+    
+    fileIn.onchange=function () {
+        var file=fileIn.files[0];
+        var reader=new FileReader();
+
+        reader.onload=function(){
+            var res=reader.result;
+            socket.emit("sendFile",res);
+            initToast("Feature not available yet...");
+        }
+
+        reader.readAsBinaryString(file);
+
+    }
+
+    //toast script
+
+    function initToast(msg) {
+        $("#toastContent").text(msg);
+        $("#toast").fadeIn(1000);
+        setTimeout("$('#toast').fadeOut(1000);",4000);
+    }
+
     
 
 </script>

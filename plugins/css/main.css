@@ -93,3 +93,22 @@
     padding:1px;
 }
 
+#toast{
+    background-color: #4b5257;
+    height: 40px;
+    max-width: 50%;
+    margin:auto;
+    border-radius: 2px;
+    position:absolute;
+    bottom: 20px;
+    right:20px;
+    display:none;
+
+}
+
+#toastContent{
+    color:white;
+    font-size: 110%;
+}
+
+
