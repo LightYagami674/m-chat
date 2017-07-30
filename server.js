@@ -55,7 +55,6 @@ io.on('connection',function(socket){
         if(socket.roomname in users) {
 
             users[socket.roomname].splice(users[socket.roomname].indexOf(socket.username), 1);
-            console.log(socket.roomname);
 
             if(isRoomEmpty(users[socket.roomname])){
                 delete users[socket.roomname];
