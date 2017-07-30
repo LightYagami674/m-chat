@@ -78,17 +78,6 @@ io.on('connection',function(socket){
         socket.emit('updateuserlist',{list:users[e.roomname]});
     })
 
-    //sending image to the users
-    
-    socket.on("sendImage",function (dataURL) {
-        socket.to(socket.roomname).emit('recieveImage',{username:socket.username,image:dataURL});
-
-    })
-
-    socket.on('reqimagetoast',function () {
-        console.log("got it");
-        socket.to(socket.roomname).emit("resimagetoast",socket.username);
-    })
 
     socket.on('reqroomlist',function(){
         var list = getRoomList();
@@ -97,7 +86,12 @@ io.on('connection',function(socket){
 
 
 
+    //image handling events
+    socket.on('sendImage',function (e) {
+        var tdata=e.image;
+        socket.to(socket.roomname).emit("recieveImage",{username:socket.username,image:tdata});
 
+    })
 
 
 

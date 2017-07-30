@@ -41,6 +41,9 @@
         </div>
     </div>
 
+
+
+
     <input type="file" id="fileInput" style="display: none;">
     <input type="file" id="imageInput" style="display:none;">
 
@@ -66,6 +69,13 @@
         <div id="toastContent"></div>
     </div>
     <!--Toast script at the end-->
+
+    <!--Hidden canvas-->
+    <canvas id="thumbnailCanvas" style="display:none;height:250px;width:250px">
+    </canvas>
+
+    <!--Hidden Image tag-->
+    <img id="hiddenImage" style="display:none;height:250px;width:250px"/>
 
 <script>
 
@@ -127,19 +137,17 @@
     })
 
     //image handler event
-    socket.on("recieveImage",function (e) {
+    socket.on("recieveImage",function(e){
         var div=document.createElement('div');
-        div.innerHTML="<div id='imtitle'>"+e.username+"</div><img src='"+e.image+"' id='images' align='center'/>"
+        div.innerHTML="<div id='imtitle'>"+e.username+"</div><img src="+e.image+" id='images' align='center'/>"
         div.id="sentImage";
         $("#chatWindow").append(div);
         showLast();
     })
 
-    //image toast handler
-    socket.on("resimagetoast",function(user){
-        console.log("got it");
-        initToast("Getting Image sent by "+user);
-    })
+
+
+
 
     function showAnotherMessage(e){
         var par=document.createElement('p');
@@ -159,6 +167,14 @@
         chat.scrollTop=chat.scrollHeight;
     }
 
+    function setOwnImage(user,image){
+        var div=document.createElement('div');
+        div.innerHTML="<div id='imtitle'>"+user+"</div><img src="+image+" id='images' align='center'/>"
+        div.id="ownImage";
+        $("#chatWindow").append(div);
+        showLast();
+    }
+
     //fileInput handler
 
     const fileIn=document.getElementById("fileInput");
@@ -169,21 +185,31 @@
     })
     
     imageIn.onchange=function () {
+        //elements inits
        var file=imageIn.files[0];
+       var img=document.getElementById('hiddenImage');
+       var canvas=document.getElementById("thumbnailCanvas");
+
+
        if(file.type.includes('image')){
-           socket.emit("reqimagetoast");
-           var reader=new FileReader();
-           //reader load event
-           reader.onload=function(){
-                var res=reader.result;
-                socket.emit("sendImage",res);
-               var div=document.createElement('div');
-               div.innerHTML="<div id='imtitle'>"+pageuser+"</div><img src='"+res+"' id='images' align='center'/>"
-               div.id="ownImage";
-               $("#chatWindow").append(div);
-               showLast();
-           }
-           reader.readAsDataURL(file);
+
+         var reader=new FileReader();
+
+         reader.onload=function(){
+
+             img.src=reader.result;
+             img.onload = function(){
+                 cc=canvas.getContext('2d');
+                 cc.drawImage(img,0,0,canvas.width,canvas.height);
+                 var tdata=canvas.toDataURL("image/png");
+                 socket.emit("sendImage",{image:tdata});
+
+                 setOwnImage(pageuser,tdata);
+             }
+
+         }
+
+         reader.readAsDataURL(file);
 
        }
        else{
@@ -191,33 +217,10 @@
        }
     }
 
-    $("#addDocument").on('click',function () {
-        fileIn.click();
-    })
-    
-    fileIn.onchange=function () {
-        var file=fileIn.files[0];
-        var reader=new FileReader();
 
-        reader.onload=function(){
-            var res=reader.result;
-            socket.emit("sendFile",res);
-            initToast("Feature not available yet...");
-        }
 
-        reader.readAsBinaryString(file);
 
-    }
 
-    //toast script
-
-    function initToast(msg) {
-        $("#toastContent").text(msg);
-        $("#toast").fadeIn(1000);
-        setTimeout("$('#toast').fadeOut(1000);",4000);
-    }
-
-    
 
 </script>
 </body>
